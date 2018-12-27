@@ -78,10 +78,22 @@ const entity = (base) => {
     *   console.log('entity created!'+result);
     * });
     **/
-    get: (entityId, entityType) => axios.request({
-      method: 'get',
-      url: `${base}/api/v1/entity/${entityType}/${entityId}`
-    }),
+    get: (entityId, entityType, token) => {
+        if (token) {
+            return axios.request({
+              method: 'get',
+              url: `${base}/api/v1/entity/${entityType}/${entityId}`,
+              headers: {
+                  'Authorization': 'Bearer ' + `${token}`,
+              }
+            })
+        } else {
+            return axios.request({
+              method: 'get',
+              url: `${base}/api/v1/entity/${entityType}/${entityId}`
+            })
+        }
+    },
     /**
     * @summary Create a group onwned by the authenticated user
     * @name create
@@ -144,13 +156,30 @@ const entity = (base) => {
     *   console.log('entity created!'+result);
     * });
     **/
-    setAttribute: (params) => axios.request({
-      method: 'PUT',
-      url: `${base}/api/v1/entity/${params.entityType}/${params.entityId}/attribute/${params.attributeType}/`,
-      data: {
-        value: params.attributeValue
-      }
-    }),
+    setAttribute: (params) => {
+         if (params.token) {
+             let token = 'Bearer ' + params.token;
+             let config = {
+              method: 'PUT',
+              url: `${base}/api/v1/entity/${params.entityType}/${params.entityId}/attribute/${params.attributeType}/`,
+              data: {
+                value: params.attributeValue
+              },
+              headers: {
+                  'Authorization': token,
+              }
+             }
+             return axios.request(config);
+         } else {
+             return axios.request({
+              method: 'PUT',
+              url: `${base}/api/v1/entity/${params.entityType}/${params.entityId}/attribute/${params.attributeType}/`,
+              data: {
+                value: params.attributeValue
+              }
+            });
+        }
+    },
     /**
     * @summary Delete Entity's attribute
     * @name deleteAttribute
